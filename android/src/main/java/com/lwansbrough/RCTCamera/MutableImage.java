@@ -190,16 +190,18 @@ public class MutableImage {
             // Add missing exif data from a sub directory
             ExifSubIFDDirectory directory = originalImageMetaData()
                .getFirstDirectoryOfType(ExifSubIFDDirectory.class);
-            for (Tag tag : directory.getTags()) {
-                int tagType = tag.getTagType();
-                // As some of exif data does not follow naming of the ExifInterface the names need
-                // to be transformed into Upper camel case format.
-                String tagName = tag.getTagName().replaceAll(" ", "");
-                Object object = directory.getObject(tagType);
-                if (tagName.equals(ExifInterface.TAG_EXPOSURE_TIME)) {
-                    exif.setAttribute(tagName, convertExposureTimeToDoubleFormat(object.toString()));
-                } else {
-                    exif.setAttribute(tagName, object.toString());
+            if (directory != null) {
+                for (Tag tag : directory.getTags()) {
+                    int tagType = tag.getTagType();
+                    // As some of exif data does not follow naming of the ExifInterface the names need
+                    // to be transformed into Upper camel case format.
+                    String tagName = tag.getTagName().replaceAll(" ", "");
+                    Object object = directory.getObject(tagType);
+                    if (tagName.equals(ExifInterface.TAG_EXPOSURE_TIME)) {
+                        exif.setAttribute(tagName, convertExposureTimeToDoubleFormat(object.toString()));
+                    } else {
+                        exif.setAttribute(tagName, object.toString());
+                    }
                 }
             }
 
