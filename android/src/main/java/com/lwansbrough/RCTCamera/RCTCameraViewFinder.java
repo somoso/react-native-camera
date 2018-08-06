@@ -52,7 +52,7 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
     // reader instance for the barcode scanner
     private final MultiFormatReader _multiFormatReader = new MultiFormatReader();
 
-    private static Camera.Parameters getCameraParameters(Camera camera) {
+    public static Camera.Parameters getCameraParameters(Camera camera) {
         try {
             return camera != null ? camera.getParameters() : null;
         }

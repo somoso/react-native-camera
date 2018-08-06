@@ -9,6 +9,7 @@ import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,7 +152,10 @@ public class RCTCamera {
     }
 
     protected List<Camera.Size> getSupportedVideoSizes(Camera camera) {
-        Camera.Parameters params = camera.getParameters();
+        Camera.Parameters params = RCTCameraViewFinder.getCameraParameters(camera);
+        if (params == null) {
+            return new ArrayList<>();
+        }
         // defer to preview instead of params.getSupportedVideoSizes() http://bit.ly/1rxOsq0
         // but prefer SupportedVideoSizes!
         List<Camera.Size> sizes = params.getSupportedVideoSizes();
@@ -219,7 +223,10 @@ public class RCTCamera {
 
         // Set (video) recording hint based on camera type. For video recording, setting
         // this hint can help reduce the time it takes to start recording.
-        Camera.Parameters parameters = camera.getParameters();
+        Camera.Parameters parameters = RCTCameraViewFinder.getCameraParameters(camera);
+        if (parameters == null) {
+            return;
+        }
         parameters.setRecordingHint(captureMode == RCTCameraModule.RCT_CAMERA_CAPTURE_MODE_VIDEO);
         camera.setParameters(parameters);
     }
@@ -230,7 +237,10 @@ public class RCTCamera {
             return;
         }
 
-        Camera.Parameters parameters = camera.getParameters();
+        Camera.Parameters parameters = RCTCameraViewFinder.getCameraParameters(camera);
+        if (parameters == null) {
+            return;
+        }
         Camera.Size pictureSize = null;
         List<Camera.Size> supportedSizes = parameters.getSupportedPictureSizes();
         switch (captureQuality) {
@@ -318,7 +328,10 @@ public class RCTCamera {
             return;
         }
 
-        Camera.Parameters parameters = camera.getParameters();
+        Camera.Parameters parameters = RCTCameraViewFinder.getCameraParameters(camera);
+        if (parameters == null) {
+            return;
+        }
         String value = parameters.getFlashMode();
         switch (torchMode) {
             case RCTCameraModule.RCT_CAMERA_TORCH_MODE_ON:
@@ -342,7 +355,10 @@ public class RCTCamera {
             return;
         }
 
-        Camera.Parameters parameters = camera.getParameters();
+        Camera.Parameters parameters = RCTCameraViewFinder.getCameraParameters(camera);
+        if (parameters == null) {
+            return;
+        }
         String value = parameters.getFlashMode();
         switch (flashMode) {
             case RCTCameraModule.RCT_CAMERA_FLASH_MODE_AUTO:
@@ -368,7 +384,10 @@ public class RCTCamera {
             return;
         }
 
-        Camera.Parameters parameters = camera.getParameters();
+        Camera.Parameters parameters = RCTCameraViewFinder.getCameraParameters(camera);
+        if (parameters == null) {
+            return;
+        }
         int maxZoom = parameters.getMaxZoom();
         if (parameters.isZoomSupported()) {
             if (zoom >=0 && zoom < maxZoom) {
@@ -393,13 +412,16 @@ public class RCTCamera {
             rotation = (orientation - deviceOrientation * 90 + 360) % 360;
         }
         cameraInfo.rotation = rotation;
-        Camera.Parameters parameters = camera.getParameters();
+        Camera.Parameters parameters = RCTCameraViewFinder.getCameraParameters(camera);
+        if (parameters == null) {
+            return;
+        }
         parameters.setRotation(cameraInfo.rotation);
 
         try {
             camera.setParameters(parameters);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("RCTCamera", "Set parameters failed: " + e.getMessage());
         }
     }
 
@@ -426,7 +448,10 @@ public class RCTCamera {
         setAdjustedDeviceOrientation(rotation);
         camera.setDisplayOrientation(displayRotation);
 
-        Camera.Parameters parameters = camera.getParameters();
+        Camera.Parameters parameters = RCTCameraViewFinder.getCameraParameters(camera);
+        if (parameters == null) {
+            return;
+        }
         parameters.setRotation(cameraInfo.rotation);
 
         // set preview size
